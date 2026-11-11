@@ -1,0 +1,9 @@
+# Normalise line endings: LF in the repo, regardless of OS.
+# Important on Windows: shell scripts and Dockerfiles with CRLF break inside Linux containers.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary

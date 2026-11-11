@@ -1,0 +1,32 @@
+# Development stack. Production gets its own file in the deployment stage.
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"   # host 5433 -> avoids clashing with another local Postgres (e.g. taskflow)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      args:
+        REQUIREMENTS: dev
+    env_file: .env
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app   # live code reload: edits on Windows appear inside the container
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy   # wait until Postgres accepts connections, not just "started"
+
+volumes:
+  pgdata:

@@ -3,3 +3,4 @@
 Django[argon2]>=5.2,<5.3
 djangorestframework>=3.16,<3.17
 psycopg[binary]>=3.2,<3.3
+djangorestframework-simplejwt>=5.5,<6

@@ -1,6 +1,7 @@
 """Settings shared by every environment. Secrets and per-environment values come from env vars."""
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.gis",
     # Third party
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",  # server-side logout & refresh rotation
     # Local
     "apps.common",
     "apps.accounts",
@@ -123,7 +125,26 @@ ADMIN_URL = env("DJANGO_ADMIN_URL", "admin/")
 
 # --- Django REST Framework ---
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     # Secure by default: every endpoint requires login unless it explicitly opts out.
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    # Per-endpoint limits, enabled on a view with `throttle_scope = "..."`.
+    # Counters live in the Django cache (Redis in production).
+    "DEFAULT_THROTTLE_RATES": {
+        "auth_login": "5/min",  # brute-force protection
+        "auth_register": "5/hour",  # mass fake-account protection
+    },
+}
+
+# --- JWT ---
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # short: a leaked token expires quickly
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,  # every refresh returns a NEW refresh token...
+    "BLACKLIST_AFTER_ROTATION": True,  # ...and the old one stops working
+    "UPDATE_LAST_LOGIN": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }

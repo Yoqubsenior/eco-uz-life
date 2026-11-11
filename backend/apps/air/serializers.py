@@ -42,7 +42,9 @@ class ReadingSerializer(serializers.ModelSerializer):
 
     def get_pollutants(self, obj: Reading) -> dict:
         # WAQI per-pollutant AQI sub-indices (see apps/air/waqi.py).
-        return {name: getattr(obj, name) for name in POLLUTANTS}
+        # Defense in depth: rows imported before the ingestion fix may hold negative noise.
+        values = {name: getattr(obj, name) for name in POLLUTANTS}
+        return {name: v if v is None or v >= 0 else None for name, v in values.items()}
 
     def get_is_stale(self, obj: Reading) -> bool:
         return obj.is_stale()

@@ -30,6 +30,15 @@ def test_parse_feed_returns_none_when_station_has_no_valid_value(bad_aqi):
     assert parse_feed(feed(bad_aqi)["data"]) is None
 
 
+def test_parse_feed_drops_negative_sensor_noise():
+    # Real data from a Tashkent station: NO2 -7 and CO -3 (seen in the app on a real phone).
+    reading = parse_feed(feed(14, pm25={"v": 14}, no2={"v": -7}, co={"v": -3})["data"])
+
+    assert reading.pm25 == 14.0
+    assert reading.no2 is None
+    assert reading.co is None
+
+
 def test_parse_feed_rejects_missing_time():
     with pytest.raises(WaqiInvalidResponse):
         parse_feed({"aqi": 50})

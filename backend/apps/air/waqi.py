@@ -70,7 +70,11 @@ def parse_feed(data: dict) -> ReadingData | None:
     def value(key: str) -> float | None:
         item = iaqi.get(key)
         v = item.get("v") if isinstance(item, dict) else None
-        return float(v) if isinstance(v, int | float) and not isinstance(v, bool) else None
+        if not isinstance(v, int | float) or isinstance(v, bool):
+            return None
+        # Sensors near zero sometimes report negative values (calibration noise).
+        # A negative pollution level is physically impossible: treat it as "no data".
+        return float(v) if v >= 0 else None
 
     return ReadingData(measured_at=measured_at, aqi=aqi, **{p: value(p) for p in POLLUTANTS})
 

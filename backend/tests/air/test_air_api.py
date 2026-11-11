@@ -58,6 +58,16 @@ def test_station_list_has_no_n_plus_one(api_client, django_assert_max_num_querie
     assert len(response.json()) == 3
 
 
+def test_negative_pollutants_already_in_db_are_hidden(api_client):
+    station = make_station("1", CHILONZOR)
+    make_reading(station, 14, pm25=14, no2=-7)  # imported before the ingestion fix
+
+    pollutants = api_client.get(STATIONS).json()[0]["latest"]["pollutants"]
+
+    assert pollutants["pm25"] == 14
+    assert pollutants["no2"] is None
+
+
 # ---------- Nearest station [FR-AQ3] ----------
 
 

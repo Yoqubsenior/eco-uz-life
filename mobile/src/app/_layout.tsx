@@ -33,6 +33,7 @@ export default function RootLayout() {
             name="register"
             options={{ title: "Ro'yxatdan o'tish", presentation: "modal" }}
           />
+          <Stack.Screen name="report/[id]" options={{ title: "Murojaat" }} />
         </Stack>
       </AuthProvider>
     </QueryClientProvider>

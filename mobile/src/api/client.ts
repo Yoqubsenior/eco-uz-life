@@ -66,13 +66,23 @@ async function refreshAccessToken(): Promise<string | null> {
 
 // ---------- Core request ----------
 
-async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number = REQUEST_TIMEOUT_MS,
+): Promise<Response> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, { ...init, signal: controller.signal });
-  } catch {
-    throw new NetworkError("Network request failed");
+  } catch (error) {
+    const timedOut = controller.signal.aborted;
+    if (__DEV__) {
+      // Dev only: the real cause appears in the Metro terminal. Never log in production
+      // (URLs and errors can contain personal data).
+      console.warn(`[api] ${init.method ?? "GET"} ${url} failed`, timedOut ? "(timeout)" : error);
+    }
+    throw new NetworkError(timedOut ? "timeout" : "Network request failed");
   } finally {
     clearTimeout(timer);
   }
@@ -83,10 +93,11 @@ type RequestOptions = {
   body?: unknown; // plain object -> JSON; FormData -> multipart
   query?: Record<string, string | number | undefined>;
   auth?: boolean; // attach the access token if we have one (default true)
+  timeoutMs?: number; // photo uploads on slow mobile networks need longer than 15 s
 };
 
 export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", body, query, auth = true } = options;
+  const { method = "GET", body, query, auth = true, timeoutMs } = options;
 
   // Built by hand: React Native's URLSearchParams is only partially implemented.
   const queryString = Object.entries(query ?? {})
@@ -102,11 +113,15 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
     // For FormData, let fetch set Content-Type itself: it must include the multipart boundary.
     if (body !== undefined && !isForm) headers["Content-Type"] = "application/json";
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-    return fetchWithTimeout(url, {
-      method,
-      headers,
-      body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
-    });
+    return fetchWithTimeout(
+      url,
+      {
+        method,
+        headers,
+        body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
+      },
+      timeoutMs,
+    );
   };
 
   const token = auth ? await getAccessToken() : null;

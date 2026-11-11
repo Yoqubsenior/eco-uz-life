@@ -26,6 +26,14 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index" options={{ title: "Havo", tabBarIcon: tabIcon("cloud-outline") }} />
       <Tabs.Screen
+        name="report"
+        options={{ title: "Yuborish", tabBarIcon: tabIcon("add-circle-outline") }}
+      />
+      <Tabs.Screen
+        name="mine"
+        options={{ title: "Murojaatlarim", tabBarIcon: tabIcon("list-outline") }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{ title: "Profil", tabBarIcon: tabIcon("person-outline") }}
       />

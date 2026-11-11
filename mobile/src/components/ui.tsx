@@ -14,20 +14,30 @@ type ButtonProps = {
   title: string;
   onPress: () => void;
   loading?: boolean;
+  disabled?: boolean;
   variant?: "primary" | "outline";
 };
 
-export function Button({ title, onPress, loading = false, variant = "primary" }: ButtonProps) {
+export function Button({
+  title,
+  onPress,
+  loading = false,
+  disabled = false,
+  variant = "primary",
+}: ButtonProps) {
   const outline = variant === "outline";
+  const inactive = loading || disabled; // loading also blocks double submits
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled: inactive, busy: loading }}
       onPress={onPress}
-      disabled={loading} // prevents double submits while a request is running
+      disabled={inactive}
       style={({ pressed }) => [
         styles.button,
         outline ? styles.buttonOutline : styles.buttonPrimary,
-        (pressed || loading) && { opacity: 0.7 },
+        pressed && { opacity: 0.7 },
+        inactive && { opacity: 0.45 },
       ]}
     >
       {loading ? (

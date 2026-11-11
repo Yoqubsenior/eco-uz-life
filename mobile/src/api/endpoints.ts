@@ -1,7 +1,14 @@
 import type { Tokens } from "@/lib/tokens";
 
 import { api } from "./client";
-import type { NearestStation, PointsSummary, User } from "./types";
+import type {
+  Category,
+  MyReport,
+  NearestStation,
+  PointsSummary,
+  ReportDetail,
+  User,
+} from "./types";
 
 export const authApi = {
   login: (email: string, password: string) =>
@@ -23,4 +30,14 @@ export const airApi = {
 
 export const pointsApi = {
   mine: () => api<PointsSummary>("/points/me/"),
+};
+
+export const reportsApi = {
+  categories: () => api<Category[]>("/reports/categories/", { auth: false }),
+  // Multipart upload: up to 3 photos -> allow 60 s on slow mobile networks.
+  create: (form: FormData) =>
+    api<ReportDetail>("/reports/", { method: "POST", body: form, timeoutMs: 60_000 }),
+  mine: () => api<MyReport[]>("/reports/mine/"),
+  detail: (id: string) => api<ReportDetail>(`/reports/${id}/`),
+  remove: (id: string) => api<null>(`/reports/${id}/`, { method: "DELETE" }),
 };

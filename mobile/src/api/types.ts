@@ -43,3 +43,36 @@ export type PointsSummary = {
   balance: number;
   transactions: { amount: number; reason: string; reason_display: string; created_at: string }[];
 };
+
+// ---------- Reports ----------
+
+export type ReportStatus = "new" | "verified" | "in_progress" | "resolved" | "rejected";
+
+export type Category = { slug: string; name_uz: string; icon: string };
+
+export type ReportDetail = {
+  id: string;
+  category: Category;
+  description: string;
+  status: ReportStatus;
+  status_display: string;
+  rejection_reason: string | null; // only sent to the author
+  lat: number;
+  lng: number;
+  district: string | null;
+  author_name: string;
+  is_mine: boolean;
+  duplicate_of: string | null;
+  photos: { url: string; width: number; height: number }[];
+  history: { to_status: ReportStatus; created_at: string }[];
+  created_at: string;
+};
+
+export type MyReport = {
+  id: string;
+  category: string; // slug
+  status: ReportStatus;
+  status_display: string;
+  thumbnail: string | null;
+  created_at: string;
+};

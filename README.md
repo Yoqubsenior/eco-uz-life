@@ -8,7 +8,7 @@ Eco UZ Life is an Android app (React Native + Expo) backed by a Django REST API 
 - **Report environmental problems** — illegal dumps, damaged trees, broken irrigation — with a photo and GPS location.
 - **Earn Eco Points** when moderators verify their reports, and compete on user and district leaderboards.
 
-> **Status:** 🚧 Stage 1 — Requirements & Architecture. See the [roadmap](#roadmap).
+> **Status:** 🚧 Stage 2 — Database design. See the [roadmap](#roadmap).
 
 ---
 
@@ -31,7 +31,8 @@ eco-uz-life/
 ├── mobile/             Expo app (Android first)
 ├── docs/
 │   ├── 01-requirements.md
-│   └── 02-architecture.md
+│   ├── 02-architecture.md
+│   └── 03-database.md
 ├── .env.example        Environment variables template (copy to .env)
 ├── .editorconfig
 ├── .gitattributes
@@ -42,11 +43,12 @@ eco-uz-life/
 
 1. [Requirements](docs/01-requirements.md) — roles, features, MVP scope, non-functional requirements
 2. [Architecture](docs/02-architecture.md) — components, data flows, key technical decisions
+3. [Database design](docs/03-database.md) — ERD, constraints, indexes, deletion rules
 
 ## Roadmap
 
 - [x] **Stage 1** — Requirements, architecture, repository skeleton
-- [ ] **Stage 2** — Database design (GeoDjango models, ERD)
+- [x] **Stage 2** — Database design (GeoDjango models, ERD)
 - [ ] **Stage 3** — Backend: project setup, Docker, auth (JWT)
 - [ ] **Stage 4** — Backend: air quality module + Celery ingestion
 - [ ] **Stage 5** — Backend: reports, moderation, Eco Points

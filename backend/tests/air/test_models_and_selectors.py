@@ -4,25 +4,11 @@ import pytest
 from django.db import IntegrityError
 from django.utils import timezone
 
-from apps.air.models import Reading, Station
+from apps.air.models import Reading
 from apps.air.selectors import latest_reading, make_point, nearest_station
+from tests.air.factories import CHILONZOR, YUNUSOBOD, make_station
 
 pytestmark = pytest.mark.django_db
-
-# Real Tashkent coordinates (lat, lng)
-CHILONZOR = (41.2756, 69.2040)
-YUNUSOBOD = (41.3647, 69.2867)
-
-
-def make_station(external_id: str, lat_lng: tuple[float, float], **kwargs) -> Station:
-    lat, lng = lat_lng
-    return Station.objects.create(
-        source=Station.Source.WAQI,
-        external_id=external_id,
-        name=f"Station {external_id}",
-        location=make_point(lat, lng),
-        **kwargs,
-    )
 
 
 def test_make_point_puts_longitude_first():

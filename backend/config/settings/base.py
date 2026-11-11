@@ -134,9 +134,16 @@ REST_FRAMEWORK = {
     # Secure by default: every endpoint requires login unless it explicitly opts out.
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
-    # Per-endpoint limits, enabled on a view with `throttle_scope = "..."`.
+    # Global limits for every endpoint (anti-scraping / basic DoS protection).
+    # Views with their own throttle_classes (login, register) replace these.
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
     # Counters live in the Django cache (Redis in production).
     "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "120/min",
         "auth_login": "5/min",  # brute-force protection
         "auth_register": "5/hour",  # mass fake-account protection
     },

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.geo",
     "apps.air",
+    "apps.reports",
 ]
 
 MIDDLEWARE = [
@@ -146,6 +147,7 @@ REST_FRAMEWORK = {
         "user": "120/min",
         "auth_login": "5/min",  # brute-force protection
         "auth_register": "5/hour",  # mass fake-account protection
+        "report_create": "10/hour",  # spam / point-farming protection
     },
 }
 

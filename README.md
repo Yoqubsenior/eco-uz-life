@@ -8,7 +8,7 @@ Eco UZ Life is an Android app (React Native + Expo) backed by a Django REST API 
 - **Report environmental problems** — illegal dumps, damaged trees, broken irrigation — with a photo and GPS location.
 - **Earn Eco Points** when moderators verify their reports, and compete on user and district leaderboards.
 
-> **Status:** 🚧 Stage 5 — Reports, moderation, Eco Points. See the [roadmap](#roadmap).
+> **Status:** 🚧 Stage 6 — Mobile app (backend MVP complete: 131 tests). See the [roadmap](#roadmap).
 
 ---
 
@@ -53,7 +53,7 @@ eco-uz-life/
 - [x] **Stage 2** — Database design (GeoDjango models, ERD)
 - [x] **Stage 3** — Backend: project setup, Docker, auth (JWT)
 - [x] **Stage 4** — Backend: air quality module + Celery ingestion
-- [ ] **Stage 5** — Backend: reports, moderation, Eco Points
+- [x] **Stage 5** — Backend: reports, moderation, Eco Points
 - [ ] **Stage 6** — Mobile: auth, map, air quality screen
 - [ ] **Stage 7** — Mobile: report flow (camera + GPS), profile, leaderboard
 - [ ] **Stage 8** — Testing, security hardening, CI

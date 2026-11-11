@@ -41,3 +41,25 @@ def auth_client(tokens) -> APIClient:
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
     return client
+
+
+@pytest.fixture
+def district(db):
+    from apps.geo.models import District, Region
+
+    region = Region.objects.create(name_uz="Toshkent shahri", slug="toshkent-shahri")
+    return District.objects.create(region=region, name_uz="Chilonzor", slug="chilonzor")
+
+
+@pytest.fixture
+def other_district(district):
+    from apps.geo.models import District
+
+    return District.objects.create(region=district.region, name_uz="Yunusobod", slug="yunusobod")
+
+
+@pytest.fixture
+def moderator(db):
+    return get_user_model().objects.create_user(
+        email="moderator@eco.uz", password=PASSWORD, display_name="Moderator", is_staff=True
+    )

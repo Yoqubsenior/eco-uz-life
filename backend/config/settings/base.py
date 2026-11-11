@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "apps.geo",
     "apps.air",
     "apps.reports",
+    "apps.points",
 ]
 
 MIDDLEWARE = [

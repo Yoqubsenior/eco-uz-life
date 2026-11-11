@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "email", "display_name", "password")
+        fields = ("id", "email", "display_name", "district", "password")
         read_only_fields = ("id",)
         # Drop the auto-generated case-SENSITIVE unique check; validate_email does it properly.
         extra_kwargs = {"email": {"validators": []}}
@@ -43,8 +43,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class MeSerializer(serializers.ModelSerializer):
+    # `district` (id) is writable; `district_name` is for display.
+    district_name = serializers.CharField(source="district.name_uz", default=None, read_only=True)
+
     class Meta:
         model = User
-        fields = ("id", "email", "display_name", "date_joined")
+        fields = ("id", "email", "display_name", "district", "district_name", "date_joined")
         # Email change needs re-verification — a separate, later feature.
         read_only_fields = ("id", "email", "date_joined")

@@ -9,12 +9,16 @@ from .managers import UserManager, normalize_email
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user: logs in with email, no username.
 
-    `district` and `avatar` are added in later stages (geo app / image handling) —
-    that is the point of owning the model from day one: it can grow with ordinary migrations.
+    Owning the model from day one means it can grow with ordinary migrations —
+    `district` was added in Stage 5 exactly that way.
     """
 
     email = models.EmailField(max_length=254, unique=True)
     display_name = models.CharField(max_length=60, blank=True)
+    # Home district: used for the district leaderboard. String reference avoids a circular import.
+    district = models.ForeignKey(
+        "geo.District", on_delete=models.SET_NULL, null=True, blank=True, related_name="residents"
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

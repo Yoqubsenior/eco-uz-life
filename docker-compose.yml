@@ -1,4 +1,20 @@
 # Development stack. Production gets its own file in the deployment stage.
+
+# Shared settings for every service built from ./backend (YAML anchor, reused below with <<).
+x-backend: &backend
+  build:
+    context: ./backend
+    args:
+      REQUIREMENTS: dev
+  env_file: .env
+  volumes:
+    - ./backend:/app   # live code reload: edits on Windows appear inside the container
+  depends_on:
+    db:
+      condition: service_healthy   # wait until Postgres accepts connections, not just "started"
+    redis:
+      condition: service_healthy
+
 services:
   db:
     image: postgis/postgis:16-3.4
@@ -13,20 +29,29 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   api:
-    build:
-      context: ./backend
-      args:
-        REQUIREMENTS: dev
-    env_file: .env
+    <<: *backend
     command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - ./backend:/app   # live code reload: edits on Windows appear inside the container
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy   # wait until Postgres accepts connections, not just "started"
+
+  # Executes tasks taken from the Redis queue.
+  worker:
+    <<: *backend
+    command: celery -A config worker --loglevel=info --concurrency=2
+
+  # The clock: puts scheduled tasks into the queue. Run exactly ONE beat, or tasks run twice.
+  beat:
+    <<: *backend
+    command: celery -A config beat --loglevel=info --schedule /tmp/celerybeat-schedule
 
 volumes:
   pgdata:

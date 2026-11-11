@@ -4,6 +4,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
@@ -150,3 +151,24 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+# --- Celery ---
+CELERY_BROKER_URL = env("REDIS_URL", "redis://redis:6379/0")
+CELERY_TASK_IGNORE_RESULT = True  # our tasks write to the DB; nobody reads return values
+CELERY_TIMEZONE = TIME_ZONE
+# Acknowledge a task only after it finishes: if the worker crashes mid-task, it is re-run.
+# Safe only because our tasks are idempotent.
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_BEAT_SCHEDULE = {
+    "fetch-air-quality-hourly": {
+        "task": "air.fetch_air_quality",
+        "schedule": crontab(minute=5),  # every hour at :05 — WAQI updates on the hour
+    },
+}
+
+# --- External air-quality API (WAQI, https://aqicn.org/api/) ---
+AIR_API_TOKEN = env("AIR_API_TOKEN", "")
+WAQI_BASE_URL = "https://api.waqi.info"
+# Tashkent bounding box: (south, west, north, east)
+AIR_BOUNDS = (41.15, 69.05, 41.45, 69.45)

@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     # Local
     "apps.common",
     "apps.accounts",
+    "apps.geo",
+    "apps.air",
 ]
 
 MIDDLEWARE = [
